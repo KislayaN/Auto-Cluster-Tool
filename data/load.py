@@ -16,6 +16,3 @@ class Load_Data:
             return self.dataset
         else:
             return FileNotFoundError(f"File is not found at {path}")
-    
-data = Load_Data()
-dataset = data.load_data('C:/Users/kisla/Downloads/archive/wine_dataset.csv')
