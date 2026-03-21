@@ -2,7 +2,10 @@ import csv
 import sys
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
 
 correct_root = r'C:\Users\kisla\OneDrive\Desktop\Everything\Auto Cluster Tool'
 
@@ -12,9 +15,9 @@ if correct_root not in sys.path:
 from load import Load_Data
 
 load_datast = Load_Data()
-load_datast.load_data(path='C:/Users/kisla/Downloads/archive/wine_dataset.csv')
-dataset = load_datast.dataset
 path = load_datast.path
+load_datast.load_data(path=path)
+dataset = load_datast.dataset
 
 class Preprocess:
     def __init__(self, dataset, path):
@@ -49,38 +52,29 @@ class Preprocess:
         self.columns = self.dataset.columns.to_list()
         dataframe = pd.DataFrame(dataset, columns=self.columns)
         
-        for column in self.columns:
-            if pd.api.types.is_numeric_dtype(dataframe[column]):
-                # calculate missing values
-                na_vals_count = dataframe[column].isna().sum()
-                
-                if na_vals_count > 0:
-                    dataframe[column].fillna(dataframe[column].mean(), inplace=True)
-            
-            if pd.api.types.is_bool_dtype(dataframe[column]):
-                dataframe[column] = dataframe[column].astype(int)
-            
-            if pd.api.types.is_object_dtype(dataframe[column]):
-                total_rows = len(dataframe.shape[0])
-                unique_val_str = dataframe[column].nunique()
-                
-                if unique_val_str > total_rows * 0.9 or unique_val_str <= 1:
-                    print(f"Dropping {column}: Not a useful category.")
-                    dataframe.drop(columns=[column], inplace=True)
-            
-            else: pass
-                
-            dataframe = pd.get_dummies(dataframe, drop_first=True)
-            
-            return dataframe
+        numeric_processor = Pipeline(steps=[
+            ('imputer', SimpleImputer(strategy='mean')),
+            ('scaler', StandardScaler())
+        ])
+
+        # 2. Define the categorical flow (Impute -> Encode)
+        categorical_processor = Pipeline(steps=[
+            ('imputer', SimpleImputer(strategy='most_frequent')),
+            ('encoder', OneHotEncoder(drop='first', sparse_output=False))
+        ])
+
+        self.preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numeric_processor, self.numeric_cols),
+                ('cat', categorical_processor, self.categorical_cols)
+            ]
+        )
+
+        self.processed_data = self.preprocessor.fit_transform(self.dataset)
+
+        self.processed_df = pd.DataFrame(
+            self.processed_data, 
+            columns=self.preprocessor.get_feature_names_out()
+        )
         
-        # Scaling features
-        scaler = StandardScaler()
-        scaled_dataframe_array = scaler.fit_transform(dataframe)
-        scaled_dataframe = pd.DataFrame(scaled_dataframe_array, columns=self.columns)
-        
-        return scaled_dataframe
-        
-preprocess = Preprocess(dataset=dataset, path=path)
-result = preprocess.preprocess()
-print(result)
+        return dataframe
