@@ -121,3 +121,5 @@ class Preprocess:
         print("Features with outliers:", list(outlier_info.keys()))
         
         print(f"Preprocessing complete. Final shape: {self.processed_df.shape}")
+        
+        return self.processed_df
