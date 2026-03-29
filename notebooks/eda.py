@@ -1,19 +1,10 @@
 import sys
 import os
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.decomposition import PCA
 
-# root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-# if root_path not in sys.path:
-#     sys.path.insert(0, root_path)
 
-# 1. Get the directory of the current file (src/features)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# 2. Go up TWO levels to reach the project root (AUTO CLUSTER TOOL)
 project_root = os.path.abspath(os.path.join(current_dir, '..'))
 
 if project_root not in sys.path:
@@ -21,18 +12,15 @@ if project_root not in sys.path:
 
 from src.visualization.plots import feature_dist_scatter_plot, feature_correlation_plot, _plot_2d, _plot_3d, _scree_plot
 
-
 class EDA:
-    def __init__(self, X_dataframe=None, processed_dataframe=None, processed_dataframe_cols=None, feature_names=None):
-        self.processed_dataframe_cols = processed_dataframe_cols
+    def __init__(self, X_dataframe=None, feature_names=None):
         self.X_dataframe = X_dataframe
-        self.processed_dataframe = processed_dataframe
         self.feature_names = feature_names
         
     def run(self):
-        for col in self.processed_dataframe_cols:
-            print(f"\nDataset Median for {col} is {self.processed_dataframe[col].median()}")
-            print(f"Dataset description for {col} is \n{self.processed_dataframe[col].describe()}")
+        for col in self.feature_names:
+            print(f"\nDataset Median for {col} is {self.X_dataframe[col].median()}")
+            print(f"Dataset description for {col} is \n{self.X_dataframe[col].describe()}")
 
         # Feature Distribution Plot
         feature_dist_scatter_plot(dataframe=self.X_dataframe, feature_names=self.feature_names, bins=20)
