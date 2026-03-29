@@ -10,9 +10,6 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
     
 from src.evaluation.metrics import Evaluator
-from data.load import Load_Data
-from data.processed_data import Preprocess
-from src.features.feature_engineering import Feature_Engineer
 
 class AgglomerativeClustering_:
     def __init__(self, n_clusters, dataset=None):
