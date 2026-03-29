@@ -85,35 +85,58 @@ class Auto_Cluster:
         for model, v in valid_scores.items():
             marker = " <-- BEST" if model == best else ""
             print(f"Model: {model} | Silhouette Score: {v['Silhouette_Score']:.4f} | Davies Bouldin Score: {v['Davies_Bouldin_Score']:.4f}{marker}")
+        
+        print(f"\nThe best model for the given dataset is {best}")
             
         return best 
          
     def model_selector(self):
+        
+        pipelines = {}
+        
         if self.hopkins_stats < 0.6:
             print("This given dataset has not any clusters, try another datasets for ideal results")
         else:
             if self.density_sweep_result:
-                print("The DBSCAN is running here")
+                print("\nDBSCAN is running.... ")
                 dbscan = DBSCAN_pipeline(dataset=self.data)
                 dbscan.fit_predict()
                 self.scores['DBSCAN'] = dbscan.evaluate()
+                if self.scores['DBSCAN'] is None:
+                    print("DBSCAN: 0 valid clusters found — excluded from comparison")
+                pipelines['DBSCAN'] = dbscan
             
+            print("\nGMM is running.... ")
             gmm_model = gmm_pipeline(data=self.data)
-            best_k = gmm_model._find_optimal_components()
             gmm_model.fit_predict()
+            best_k = gmm_model._find_optimal_components()
             result_gmm = gmm_model.evaluate()
             self.scores['GMM'] = result_gmm
-        
+            if self.scores['GMM'] is None:
+                print("GMM: 0 valid clusters found — excluded from comparison")
+            pipelines['GMM'] = gmm_model
+            gmm_model.plot()
+
+            print("\nKMeans is running.... ")
             kmeans_model = KMeansClustering_(k=best_k, dataset=self.data)
             kmeans_model.fit()
             result_km = kmeans_model.evaluate()
             self.scores['K-Means'] = result_km
+            if self.scores['K-Means'] is None:
+                print("K-Means: 0 valid clusters found — excluded from comparison")
+            pipelines['K-Means'] = kmeans_model
+            kmeans_model.plot()
             
+            print("\nAgglomerative is running.... ")
             agglomerative_model = AgglomerativeClustering_(n_clusters=best_k, dataset=self.data)
             agglomerative_model.fit_predict()
             result_agg = agglomerative_model.evaluate()
             self.scores['Agglomerative'] = result_agg
+            if self.scores['Agglomerative'] is None:
+                print("Agglomerative: 0 valid clusters found — excluded from comparison")
+            pipelines['Agglomerative'] = agglomerative_model
+            agglomerative_model.plot_dendogram()
             
-        print(self.scores)
-        
-        self.best_model()
+            best_name = self.best_model()
+            
+        return pipelines[best_name]
