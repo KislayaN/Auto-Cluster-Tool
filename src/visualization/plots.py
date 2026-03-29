@@ -46,15 +46,21 @@ def _plot_3d(data, n_components, top_drivers, processor):
     ax.set_zlabel(f"PC3: {top_drivers['PC3']}")
     plt.show()
 
-def _plot_2d(data, pca, top_drivers, processor):
-    plt.figure(figsize=(8, 6))
-    # Access the target column correctly
-    target_data = processor.dataset[processor.target]
+def _plot_2d(data, labels):
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(data)
     
-    sns.scatterplot(x=data[:, 0], y=data[:, 1], hue=target_data, palette='viridis')
-    plt.title(f"2D Cluster View (Total PCs: {pca.n_components_})")
-    plt.xlabel(f"PC1 ({top_drivers['PC1']}): {pca.explained_variance_ratio_[0]:.1%}")
-    plt.ylabel(f"PC2 ({top_drivers['PC2']}): {pca.explained_variance_ratio_[1]:.1%}")
+    plt.figure(figsize=(8, 6))
+    for label in set(labels):
+        mask = labels == label
+        plt.scatter(X_pca[mask, 0], X_pca[mask, 1],
+                   label=f'Cluster {label}', alpha=0.8, edgecolors='k')
+    plt.title("Best Model Clusters")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
 
 def _scree_plot(explained_variance_ratio, n_selected):
@@ -68,3 +74,31 @@ def _scree_plot(explained_variance_ratio, n_selected):
     plt.grid(True, alpha=0.3)
     plt.show()
 
+def plot_comparision(scores: dict):
+    valid = {k: v for k, v in scores.items() if v is not None}
+    
+    models = list(valid.keys())
+    
+    silhouette = [valid[m]['Silhouette_Score'] for m in models]
+    dav_b = [valid[m]['Davies_Bouldin_Score'] for m in models]
+    
+    x = np.arange(len(models))
+    width = 0.35
+    
+    fig, axes = plt.subplots(figsize=(10,5))
+    
+    bars1 = axes.bar(x=x-width/2, height=silhouette, width=width, label='Silhouette (higher=better)', color='steelblue')
+    bars2 = axes.bar(x=x+width/2, height=dav_b, width=width, label='Davies-Bouldin (lower=better)', color='coral')
+    
+    for bar in bars1:
+        axes.text(bar.get_x() + bar.get_width() /2, bar.get_height() + 0.01, f'{bar.get_height():.2f}', ha='center', fontsize=9)
+        
+    for bar in bars2:
+        axes.text(bar.get_x() + bar.get_width() /2, bar.get_height() + 0.01, f'{bar.get_height():.2f}', ha='center', fontsize=9)
+        
+    axes.set_xticks(x)
+    axes.set_xticklabels(models)
+    axes.set_title("Model comparison")
+    axes.legend()
+    plt.tight_layout()
+    plt.show()
