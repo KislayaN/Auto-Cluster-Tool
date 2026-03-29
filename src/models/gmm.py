@@ -1,25 +1,25 @@
 from sklearn.mixture import GaussianMixture
-from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
+from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import numpy as np
 
+from sklearn.datasets import make_blobs
+
 import sys
 import os
-
-from sklearn.cluster import DBSCAN
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
-
-from sklearn.datasets import make_blobs
+    
+from src.evaluation.metrics import Evaluator
 
 class gmm_pipeline:
     def __init__(self, data):
-        self.dataest = data
+        self.dataset = data
         self.n_components = self._find_optimal_components()
         self.model = GaussianMixture(n_components=3, random_state=43)
         self.labels = None
@@ -32,9 +32,9 @@ class gmm_pipeline:
         
         for k in range(2, 8):
             gmm = GaussianMixture(n_components=k, random_state=43)
-            gmm.fit(self.dataest)
-            bic = gmm.bic(self.dataest)
-            aic = gmm.aic(self.dataest)
+            gmm.fit(self.dataset)
+            bic = gmm.bic(self.dataset)
+            aic = gmm.aic(self.dataset)
             print(f"k={k} | BIC={bic:.2f} | AIC={aic:.2f}")
             
             if bic < best_bic:
@@ -45,7 +45,7 @@ class gmm_pipeline:
         return best_k
     
     def fit_predict(self):
-        self.labels = self.model.fit_predict(self.dataest)
+        self.labels = self.model.fit_predict(self.dataset)
         
         min_cluster_size = 10
         from collections import Counter
@@ -62,11 +62,13 @@ class gmm_pipeline:
         if self.labels is None:
             print("Run fit_predict first")
             return None
-        return silhouette_score(self.dataest, self.labels)
+        evaluator = Evaluator(self.dataset, self.labels)
+        evaluation = evaluator.evaluate()
+        return evaluation
     
     def plot(self):
         pca = PCA(n_components=2)
-        X_pca = pca.fit_transform(self.dataest)
+        X_pca = pca.fit_transform(self.dataset)
         
         plt.figure(figsize=(10, 6))
         for label in set(self.labels):
