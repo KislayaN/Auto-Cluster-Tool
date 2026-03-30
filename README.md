@@ -107,7 +107,7 @@ The tool will automatically:
 | Agglomerative | 0.4596 | 0.8373 | 237.69 |
 | **Winner** | **KMeans** | 
  
-[Insert cluster plot screenshot here]
+![Best Model Clusters Visualization](plots_img/best_model.png)
 
 ## Design Decisions
  
