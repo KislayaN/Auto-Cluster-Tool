@@ -100,12 +100,12 @@ The tool will automatically:
 ## Results
  
 ### Model Comparison on Iris Dataset
-| Model | Silhouette | Davies-Bouldin |
-|-------|-----------|----------------|
-| KMeans | 0.5528 | 0.6619 |
-| GMM | 0.5021 | 0.7432 |
-| Agglomerative | 0.4981 | 0.7108 |
-| **Winner** | **KMeans** | |
+| Model | Silhouette | Davies-Bouldin | Calinski_Harabasz |
+|-------|------------|----------------|-------------------|
+| KMeans | 0.4610 | 0.8352 | 242.59 |
+| GMM | 0.3734 | 1.0912 | 186.46 | 
+| Agglomerative | 0.4596 | 0.8373 | 237.69 |
+| **Winner** | **KMeans** | 
  
 [Insert cluster plot screenshot here]
 
