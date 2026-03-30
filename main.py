@@ -13,7 +13,7 @@ from data.processed_data import Preprocess
 from notebooks.eda import EDA
 from src.features.feature_engineering import Feature_Engineer
 from src.models.auto_cluster import Auto_Cluster
-from src.visualization.plots import plot_comparision
+from src.visualization.plots import plot_comparision, _plot_2d
 
 def main(path, show_eda=True):
     
@@ -54,6 +54,14 @@ def main(path, show_eda=True):
     
     # Scores Comparison
     plot_comparision(cluster_setup.scores)
+    
+    _plot_2d(
+        data=dataset,
+        labels=best_pipeline.labels,
+        name='KMeans',
+        n_components=2,
+        title=f"Best Model {cluster_setup.best_name}"
+    )
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auto Cluster Tool")

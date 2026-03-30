@@ -69,6 +69,7 @@ class Auto_Cluster:
          self.hopkins_stats = hopkins_stats(self.data)
          self.density_sweep_result = has_clean_eps_window(self.data)
          self.scores = {}
+         self.best_name = None
          
     def best_model(self):
         valid_scores = {k: v for k, v in self.scores.items() if v is not None}
@@ -140,13 +141,13 @@ class Auto_Cluster:
             pipelines['Agglomerative'] = agglomerative_model
             agglomerative_model.plot_dendogram()
             
-            best_name = self.best_model()
-            best_pipeline = pipelines[best_name]
+            self.best_name = self.best_model()
+            best_pipeline = pipelines[self.best_name]
             
             print("Automatic Model Selection Performed")
             
             print(f"\n--- Final Selection ---")
             print(f"Model: {best_pipeline.model_name}")
             
-            return pipelines[best_name]
+            return pipelines[self.best_name]
             

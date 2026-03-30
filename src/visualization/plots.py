@@ -41,7 +41,7 @@ def dendogram(data):
     plt.ylabel("Distance")
     plt.show()
 
-def _plot_2d(data, labels, name, n_components):
+def _plot_2d(data, labels, name, n_components, title=None):
     pca = PCA(n_components=n_components)
     X_pca = pca.fit_transform(data)
     
@@ -61,7 +61,10 @@ def _plot_2d(data, labels, name, n_components):
         mask = labels == label
         plt.scatter(X_pca[mask, 0], X_pca[mask, 1],
                    label=f'Cluster {label}', alpha=0.8, edgecolors='k')
-    plt.title(f"{name} Clusters (n_components={n_components})")
+    if title == None:
+        plt.title(f"{name} Clusters (n_components={n_components})")
+    else: 
+        plt.title(f"{title} (n_components={n_components})")
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.legend()
