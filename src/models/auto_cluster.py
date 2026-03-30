@@ -76,15 +76,16 @@ class Auto_Cluster:
         for model in valid_scores:
             silhouette = valid_scores[model]['Silhouette_Score']
             dav_b = valid_scores[model]['Davies_Bouldin_Score']
+            cal_h = valid_scores[model]['Calinski_Harabasz_Score']
             
-            valid_scores[model]['combined_scores'] = silhouette - (dav_b / 10)
+            valid_scores[model]['combined_scores'] = silhouette - (dav_b / 10) + (cal_h / 1000)
             
         best = max(valid_scores, key=lambda k: valid_scores[k]['combined_scores'])
         
         print("-------------------- Model Comparison --------------------")
         for model, v in valid_scores.items():
             marker = " <-- BEST" if model == best else ""
-            print(f"Model: {model} | Silhouette Score: {v['Silhouette_Score']:.4f} | Davies Bouldin Score: {v['Davies_Bouldin_Score']:.4f}{marker}")
+            print(f"Model: {model} | Silhouette: {v['Silhouette_Score']:.4f} | DB: {v['Davies_Bouldin_Score']:.4f} | CH: {v['Calinski_Harabasz_Score']:.2f}{marker}")
         
         print(f"\nThe best model for the given dataset is {best}")
             
