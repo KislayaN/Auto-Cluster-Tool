@@ -67,32 +67,32 @@ def _plot_2d(data, labels, name, n_components):
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
-
+    
 def plot_comparision(scores: dict):
     valid = {k: v for k, v in scores.items() if v is not None}
     
     models = list(valid.keys())
-    
     silhouette = [valid[m]['Silhouette_Score'] for m in models]
     dav_b = [valid[m]['Davies_Bouldin_Score'] for m in models]
+    cal_h = [valid[m]['Calinski_Harabasz_Score'] / 1000 for m in models]  # scale down
     
     x = np.arange(len(models))
-    width = 0.35
+    width = 0.25  # ← smaller width for 3 bars
     
-    fig, axes = plt.subplots(figsize=(10,5))
+    fig, axes = plt.subplots(figsize=(12, 5))
     
-    bars1 = axes.bar(x=x-width/2, height=silhouette, width=width, label='Silhouette (higher=better)', color='steelblue')
-    bars2 = axes.bar(x=x+width/2, height=dav_b, width=width, label='Davies-Bouldin (lower=better)', color='coral')
+    bars1 = axes.bar(x - width, silhouette, width, label='Silhouette (higher=better)', color='steelblue')
+    bars2 = axes.bar(x, dav_b, width, label='Davies-Bouldin (lower=better)', color='coral')
+    bars3 = axes.bar(x + width, cal_h, width, label='Calinski-Harabasz /1000 (higher=better)', color='mediumseagreen')
     
-    for bar in bars1:
-        axes.text(bar.get_x() + bar.get_width() /2, bar.get_height() + 0.01, f'{bar.get_height():.2f}', ha='center', fontsize=9)
-        
-    for bar in bars2:
-        axes.text(bar.get_x() + bar.get_width() /2, bar.get_height() + 0.01, f'{bar.get_height():.2f}', ha='center', fontsize=9)
-        
+    for bars in [bars1, bars2, bars3]:
+        for bar in bars:
+            axes.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                     f'{bar.get_height():.2f}', ha='center', fontsize=8)
+    
     axes.set_xticks(x)
     axes.set_xticklabels(models)
-    axes.set_title("Model comparison")
+    axes.set_title("Model Comparison")
     axes.legend()
     plt.tight_layout()
     plt.show()
