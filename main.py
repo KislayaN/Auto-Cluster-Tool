@@ -1,5 +1,6 @@
 import os 
 import sys
+import argparse
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
@@ -56,3 +57,11 @@ def main(path, show_eda=True):
     
     # 2D PCA plot
     _plot_2d(data=dataset, labels=best_pipeline.labels)
+    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Auto Cluster Tool")
+    parser.add_argument('--path', type=str, required=True, help='Path to CSV file')
+    parser.add_argument('--eda', type=bool, required=True, help='Show Exploratory Data Analysis (EDA) plots')
+    
+    args = parser.parse_args()
+    main(path=args.path, show_eda=args.eda)
