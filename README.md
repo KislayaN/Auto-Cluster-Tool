@@ -64,7 +64,7 @@ Auto-Cluster-Tool/
  
 1. Clone the repository
 ```markdown
-git clone https://github.com/yourusername/auto-cluster-tool.git
+git clone https://github.com/KislayaN/auto-cluster-tool.git
 cd auto-cluster-tool
  ```
 
@@ -97,6 +97,7 @@ python main.py
 ```
 
 # Option 2 - Terminal with arguments
+Important: Dependencies should be installed first (check Installation)
 2. Run:
 ```markdown
 python main.py --path "path/to/your/dataset.csv" --eda True
